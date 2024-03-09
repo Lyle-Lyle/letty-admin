@@ -1,8 +1,16 @@
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Checkbox, Form, Input, message, App } from 'antd';
 import styles from './index.module.less';
 
-const onFinish = (values: any) => {
-    console.log('Success:', values);
+import api from '@/api';
+import { Login } from '@/types/api';
+import storage from '@/utils/storage';
+
+const onFinish = async (values: Login.params) => {
+    const data = await api.login(values);
+    storage.set('token', data);
+    message.success('登录成功');
+    // const params = new URLSearchParams(location.search);
+    // TODO 跳转页面
 };
 
 const onFinishFailed = (errorInfo: any) => {
@@ -10,12 +18,13 @@ const onFinishFailed = (errorInfo: any) => {
 };
 
 type FieldType = {
-    username?: string;
-    password?: string;
+    userAccount?: string;
+    userPassword?: string;
     remember?: string;
 };
 
-export default function Login() {
+export default function LoginFC() {
+    const { message, notification, modal } = App.useApp();
     return (
         <div className={styles.login}>
             <div className={styles.loginWrapper}>
@@ -31,17 +40,17 @@ export default function Login() {
                     autoComplete="off"
                 >
                     <Form.Item<FieldType>
-                        label="Username"
-                        name="username"
-                        rules={[{ required: true, message: 'Please input your username!' }]}
+                        label="UserAccount"
+                        name="userAccount"
+                        rules={[{ required: true, message: 'Please input your userAccount!' }]}
                     >
                         <Input />
                     </Form.Item>
 
                     <Form.Item<FieldType>
                         label="Password"
-                        name="password"
-                        rules={[{ required: true, message: 'Please input your password!' }]}
+                        name="userPassword"
+                        rules={[{ required: true, message: 'Please input your userPassword!' }]}
                     >
                         <Input.Password />
                     </Form.Item>

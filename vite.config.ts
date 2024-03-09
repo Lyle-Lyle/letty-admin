@@ -14,9 +14,13 @@ export default defineConfig({
     },
     server: {
         host: '127.0.0.1',
-        port: 8080,
+        port: 5173,
         proxy: {
-            '/api': 'http://api-driver.marsview.cc',
+            '/api': {
+                target: 'http://localhost:8002',
+                changeOrigin: true,
+                rewrite: path => path.replace(/^\/api/, ''),
+            },
         },
     },
     plugins: [react()],
