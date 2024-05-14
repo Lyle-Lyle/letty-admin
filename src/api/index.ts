@@ -1,0 +1,75 @@
+import axios, {
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosRequestTransformer,
+} from 'axios';
+import config from '@/config.json';
+import qs from 'qs';
+import { message } from 'antd';
+
+const instance = axios.create({
+  // timeout: 1000,
+  baseURL: config.baseURL,
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'x-api-key': 'ab428ee8-c6ae-4bee-86ca-a5bd3437cff5',
+  },
+});
+
+instance.interceptors.request.use(
+  function (config) {
+    // config.transformRequest = () => {
+    //   return qs.stringify({ name: 'lyle', age: 22 });
+    // };
+    const url = config.url;
+    const method = config.method?.toUpperCase();
+    // 判断是否需要 formData格式的数据
+    if (
+      (url === '/my/article/add' && method == 'POST') ||
+      (url === '/my/article/info' && method === 'PUT')
+    ) {
+      config.transformRequest = [];
+    } else {
+      config.transformRequest = requestTransformer;
+    }
+
+    return config;
+  },
+  function (error) {
+    return Promise.reject(error);
+  }
+);
+
+instance.interceptors.response.use(
+  function (response) {
+    if (response.data) {
+      // 有响应体的情况
+      return response.data;
+    } else {
+      // 没有响应体，则自定义一个标准的响应体，并返回
+      return { code: 0, message: response.statusText };
+    }
+  },
+  function (error: AxiosError<{ code: number; message: string }>) {
+    if (error.response && error.response.data) {
+      // 有响应体的情况
+      message.error(error.response.data.message);
+      return Promise.reject(error.response.data);
+    } else {
+      // 没有响应体的情况
+      console.log(error);
+      message.error(error.message);
+      return Promise.reject({ code: 1, message: error.message });
+    }
+  }
+);
+
+const requestTransformer: AxiosRequestTransformer = (data) => {
+  if (data instanceof FormData) {
+    return qs.stringify(Object.fromEntries(data));
+  } else {
+    return qs.stringify(data);
+  }
+};
+
+export default instance;
