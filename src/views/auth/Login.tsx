@@ -1,19 +1,29 @@
 import React from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input } from 'antd';
-import { Link } from 'react-router-dom';
+import { Button, Checkbox, Form, Input, message } from 'antd';
+import {
+  ActionFunctionArgs,
+  Link,
+  redirect,
+  useFetcher,
+  useSearchParams,
+} from 'react-router-dom';
+import { loginApi } from '@/api/auth-api';
+import { setToken } from '@/store/app-store';
 
 const Login: React.FC = () => {
-  const onFinish = (values: any) => {
+  const [searchParams] = useSearchParams();
+  const loginFetcher = useFetcher();
+
+  const onFinish = (values: LoginForm) => {
+    loginFetcher.submit(values, { method: 'POST' });
     console.log('Received values of form: ', values);
   };
 
   return (
     <Form
-      name='normal_login'
-      className='login-form'
-      initialValues={{ remember: true }}
       onFinish={onFinish}
+      initialValues={{ username: searchParams.get('uname') }}
     >
       <Form.Item
         name='username'
@@ -53,13 +63,31 @@ const Login: React.FC = () => {
       </Form.Item>
 
       <Form.Item>
-        <Button type='primary' htmlType='submit' className='login-form-button'>
+        <Button
+          type='primary'
+          htmlType='submit'
+          className='login-form-button'
+          loading={loginFetcher.state !== 'idle' && { delay: 200 }}
+        >
           Log in
         </Button>
         Or <Link to='/register'>register now!</Link>
       </Form.Item>
     </Form>
   );
+};
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const fd = await request.formData();
+  try {
+    const res = await loginApi(fd);
+    setToken(res.token);
+    message.success(res.message);
+    return redirect('/');
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
 };
 
 export default Login;
