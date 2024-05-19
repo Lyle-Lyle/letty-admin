@@ -6,6 +6,8 @@ import axios, {
 import config from '@/config.json';
 import qs from 'qs';
 import { message } from 'antd';
+import useAppStore from '@/store/app-store';
+import { resetAllStore } from '@/store/resetters';
 
 const instance = axios.create({
   // timeout: 1000,
@@ -33,6 +35,12 @@ instance.interceptors.request.use(
       config.transformRequest = requestTransformer;
     }
 
+    // 为请求头按需挂载 token
+    const token = useAppStore.getState().token;
+    if (url?.includes('/my') && token) {
+      config.headers.Authorization = token;
+    }
+
     return config;
   },
   function (error) {
@@ -53,7 +61,16 @@ instance.interceptors.response.use(
   function (error: AxiosError<{ code: number; message: string }>) {
     if (error.response && error.response.data) {
       // 有响应体的情况
-      message.error(error.response.data.message);
+      if (error.response.status === 401) {
+        if (useAppStore.getState().token) {
+          // token 过期了
+          message.error('登录过期，请重新登录！');
+          // 清空 store
+          resetAllStore();
+        }
+      } else {
+        message.error(error.response.data.message);
+      }
       return Promise.reject(error.response.data);
     } else {
       // 没有响应体的情况

@@ -77,13 +77,15 @@ const Login: React.FC = () => {
   );
 };
 
+//因为登录成功之后，会把 token 存储到全局 store。紧接着会触发 AuthLayout 组件中的 if(token) 判断，发现 token 有值，因此会通过 <Navigate to="/" replace /> 自动跳转到后台主页。
+
 export const action = async ({ request }: ActionFunctionArgs) => {
   const fd = await request.formData();
   try {
     const res = await loginApi(fd);
     setToken(res.token);
     message.success(res.message);
-    return redirect('/');
+    return null;
   } catch (err) {
     console.log(err);
     return null;
