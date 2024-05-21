@@ -54,3 +54,37 @@ type CateItem = {
 };
 
 type ArtCateAddForm = Omit<CateItem, 'id'>;
+
+type ArticleAddForm = {
+  title: string;
+  cate_id: string;
+  content: string;
+  state: '草稿' | '已发布';
+  cover_img: Blob;
+  [x: string]: string | Blob;
+};
+type ArticleEditForm = ArticleAddForm & { readonly id: string };
+
+type ArticleAddBaseForm = Partial<Pick<ArticleAddForm, 'title' | 'cate_id'>>;
+type ArticleEditBaseForm = ArticleAddBaseForm;
+
+type ArtListQuery = {
+  pagenum: number;
+  pagesize: number;
+  cate_id: number | string;
+  state: string;
+};
+
+// 文章的类型
+type Article = {
+  readonly id: number;
+  title: string;
+  pub_date: string;
+  state: '草稿' | '已发布';
+  cate_name: string;
+};
+
+// 文章列表接口返回的数据类型
+interface ArticleListResponse extends BaseResponse<Article[]> {
+  total: number;
+}

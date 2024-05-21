@@ -1,8 +1,8 @@
-import { useState, type FC } from 'react';
+import { useEffect, useState, type FC } from 'react';
 import { Button, PopconfirmProps, message } from 'antd';
 import { Popconfirm } from 'antd';
-import { useSubmit } from 'react-router-dom';
-import { useNavSubmitting } from '@/utils/hooks';
+import { useActionData, useLoaderData, useSubmit } from 'react-router-dom';
+import { useNavLoading, useNavSubmitting } from '@/utils/hooks';
 
 const ButtonDelete: FC<{ id: number }> = ({ id }) => {
   const [open, setOpen] = useState(false);
@@ -10,6 +10,11 @@ const ButtonDelete: FC<{ id: number }> = ({ id }) => {
   const submitting = useNavSubmitting('DELETE');
   const loading = useNavLoading('DELETE');
   const actionData = useActionData() as boolean;
+  const loaderData = useLoaderData() as {
+    total: number;
+    q: ArtListQuery;
+    list: Article[];
+  } | null;
   const handleDelete = () => {
     if (id === 1 || id === 2) {
       return message.error('管理员不允许删除此分类！');
@@ -17,7 +22,12 @@ const ButtonDelete: FC<{ id: number }> = ({ id }) => {
     setOpen(true);
     console.log(id);
   };
+  //TODO 有点问题
   const confirm = () => {
+    // 判断是否需要对页码值进行回退操作
+    // 1. 当前页只剩下1条数据了
+    // 2. 当前页是最后一页
+    // 3. 当前页不是第1页
     console.log('确认删除！', id);
     submit({ id }, { method: 'DELETE' });
   };

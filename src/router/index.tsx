@@ -10,9 +10,14 @@ import UserAvatar, {
   action as userAvatarAction,
 } from '@/views/user/user-avatar';
 import UserInfo, { action as userInfoAction } from '@/views/user/user-info';
-import ArticleAdd from '@/views/article/article-add';
-import ArticleEdit from '@/views/article/article-edit';
-import ArticleList from '@/views/article/article-list';
+import ArticleEdit, {
+  loader as artEditLoader,
+  action as artEditAction,
+} from '@/views/article/article-edit';
+import ArticleList, {
+  loader as artListLoader,
+  action as artListAction,
+} from '@/views/article/article-list';
 import ArticleCate, {
   loader as artCateLoader,
   action as artCateAction,
@@ -20,6 +25,10 @@ import ArticleCate, {
 import UserPassword, {
   action as userPwdAction,
 } from '@/views/user/user-password';
+import ArticleAdd, {
+  loader as artAddLoader,
+  action as artAddAction,
+} from '@/views/article/article-add';
 
 const router = createBrowserRouter([
   {
@@ -66,9 +75,26 @@ const router = createBrowserRouter([
         loader: artCateLoader,
         action: artCateAction,
       },
-      { path: 'art-list', element: <ArticleList /> },
-      { path: 'art-add', element: <ArticleAdd /> },
-      { path: 'art-edit/:id', element: <ArticleEdit /> },
+      {
+        path: 'art-list',
+        element: <ArticleList />,
+        loader: artListLoader,
+        action: artListAction,
+      },
+      {
+        path: 'art-add',
+        element: <ArticleAdd />,
+        loader: artAddLoader,
+        action: artAddAction,
+        shouldRevalidate: () => false,
+      },
+      {
+        path: 'art-edit/:id',
+        element: <ArticleEdit />,
+        loader: artEditLoader,
+        action: artEditAction,
+        shouldRevalidate: () => false,
+      },
     ],
   },
 ]);

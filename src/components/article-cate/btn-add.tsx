@@ -3,6 +3,7 @@ import { Button, Form, Input, Modal } from 'antd';
 import { useActionData, useSubmit } from 'react-router-dom';
 
 import { useNavLoading, useNavSubmitting } from '@/utils/hooks.ts';
+import useArtAddStore, { selectHasHydrated } from '@/store/art-add-store';
 
 const ButtonAdd: FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -11,6 +12,7 @@ const ButtonAdd: FC = () => {
   const loading = useNavLoading('POST');
   const submitting = useNavSubmitting('POST');
   const actionData = useActionData() as boolean;
+
   const handleOk = () => {
     // 关闭对话框
     setIsModalOpen(false);

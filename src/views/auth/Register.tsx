@@ -13,7 +13,7 @@ import { regApi } from '@/api/auth-api';
 const Register: React.FC = () => {
   const submit = useSubmit();
   const navigation = useNavigation();
-
+  const submitting = useNavSubmitting('POST');
   const onFinish = (values: RegisterForm) => {
     console.log('Received values of form: ', values);
     submit(values, {
