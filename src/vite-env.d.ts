@@ -38,3 +38,19 @@ type MenuItem = {
   icon: React.ReactNode;
   children?: MenuItem[];
 };
+
+type UserInfoForm = Pick<User, 'id' | 'email' | 'nickname'>;
+
+type ResetPwdForm = {
+  old_pwd: string;
+  new_pwd: string;
+  re_pwd: string;
+};
+
+type CateItem = {
+  readonly id: number;
+  cate_name: string;
+  cate_alias: string;
+};
+
+type ArtCateAddForm = Omit<CateItem, 'id'>;

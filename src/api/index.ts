@@ -34,7 +34,16 @@ instance.interceptors.request.use(
     } else {
       config.transformRequest = requestTransformer;
     }
-
+    // 为 config 挂载请求头的 params 转换器，把 FormData 格式的请求头数据转换为 querystring 格式的查询字符串
+    config.paramsSerializer = {
+      serialize(params) {
+        if (params instanceof FormData) {
+          return qs.stringify(Object.fromEntries(params));
+        } else {
+          return qs.stringify(params);
+        }
+      },
+    };
     // 为请求头按需挂载 token
     const token = useAppStore.getState().token;
     if (url?.includes('/my') && token) {

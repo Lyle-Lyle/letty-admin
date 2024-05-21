@@ -53,5 +53,12 @@ export const selectName = (state: UserStoreType) =>
 // 头像
 export const selectAvatar = (state: UserStoreType) => state.user.user_pic;
 
+// 派生用户的基本信息
+export const selectUserInfo = (state: UserStoreType) => ({
+  id: state.user.id,
+  nickname: state.user.nickname,
+  email: state.user.email,
+});
+
 // 导出 store 的 hook
 export default useUserStore;
