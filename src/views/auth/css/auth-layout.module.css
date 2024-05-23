@@ -1,0 +1,17 @@
+.container {
+  min-height: 100vh;
+  background: #ebebeb url('@/assets/images/background.jpg') no-repeat;
+  background-size: contain;
+}
+.container .box {
+  width: 500px;
+  height: 350px;
+  box-sizing: border-box;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0), #ffffff);
+  border-radius: 10px;
+  padding: 60px 30px 30px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -60%);
+}

@@ -1,18 +1,19 @@
-import { useMemo, type FC } from 'react';
-import { Table, Button } from 'antd';
-import type { TableProps } from 'antd';
-import dayjs from 'dayjs';
-import BtnEditAritcle from './btn-edit';
-import BtnDeleteArticle from './btn-delete';
-import { useSearchParams } from 'react-router-dom';
-import ListOrder from './list-order';
+import type { FC } from 'react'
+import { useMemo } from 'react'
+import { Table } from 'antd'
+import type { TableProps } from 'antd'
+import dayjs from 'dayjs'
+import { useSearchParams } from 'react-router-dom'
+import BtnEditAritcle from './btn-edit'
+import BtnDeleteArticle from './btn-delete'
+import ListOrder from './list-order'
 
 const columns: TableProps<Article>['columns'] = [
   {
     title: '序号',
     render(_, __, index) {
-      return <ListOrder index={index} />;
-    },
+      return <ListOrder index={index} />
+    }
   },
   { title: '标题', dataIndex: 'title' },
   { title: '分类', dataIndex: 'cate_name' },
@@ -20,8 +21,8 @@ const columns: TableProps<Article>['columns'] = [
     title: '发表时间',
     dataIndex: 'pub_date',
     render(value) {
-      return dayjs(value).format('YYYY-MM-DD HH:mm:ss');
-    },
+      return dayjs(value).format('YYYY-MM-DD HH:mm:ss')
+    }
   },
   { title: '状态', dataIndex: 'state' },
   {
@@ -32,19 +33,16 @@ const columns: TableProps<Article>['columns'] = [
           <BtnEditAritcle id={record.id} />
           <BtnDeleteArticle id={record.id} />
         </>
-      );
-    },
-  },
-];
+      )
+    }
+  }
+]
 
-type Props = TableProps & Partial<{ total: number } & ArtListQuery>;
+type Props = TableProps & Partial<{ total: number } & ArtListQuery>
 
 const ArticleListTable: FC<Props> = (props) => {
-  // 二次封装的规范：
-  // 1. 尽量不要改动原组件上的属性，如果需要添加额外属性的话，可以进行拓展和自定义
-  // 2. 如果原组件上的属性比较简单，可以不进行二次封装，直接借用原组件上的属性
-  // 3. 如果原组件上的属性配置比较复杂，则建议进行二次封装
-  const [, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams()
+
   const pageOptions = useMemo<TableProps['pagination']>(() => {
     return {
       total: props.total,
@@ -55,21 +53,19 @@ const ArticleListTable: FC<Props> = (props) => {
       showSizeChanger: true,
       showQuickJumper: true,
       showTotal(total) {
-        return `共${total}条数据`;
+        return `共${total}条数据`
       },
       onChange(page, pageSize) {
-        setSearchParams({
-          pagenum: page,
-          pagesize: pageSize,
-          cate_id: props.cate_id,
-          state: props.state,
-        } as unknown as {
-          [x: string]: string;
-        });
-      },
-    };
-  }, [props, setSearchParams]);
-  return <Table {...props} columns={columns} pagination={pageOptions} />;
-};
+        setSearchParams({ pagenum: page, pagesize: pageSize, cate_id: props.cate_id, state: props.state } as unknown as { [x: string]: string })
+      }
+    }
+  }, [props, setSearchParams])
 
-export default ArticleListTable;
+  // 二次封装的规范：
+  // 1. 尽量不要改动原组件上的属性，如果需要添加额外属性的话，可以进行拓展和自定义
+  // 2. 如果原组件上的属性比较简单，可以不进行二次封装，直接借用原组件上的属性
+  // 3. 如果原组件上的属性配置比较复杂，则建议进行二次封装
+  return <Table {...props} columns={columns} pagination={pageOptions} />
+}
+
+export default ArticleListTable

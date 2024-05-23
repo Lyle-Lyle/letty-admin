@@ -1,95 +1,71 @@
-import React from 'react';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input, message } from 'antd';
-import {
-  ActionFunctionArgs,
-  Link,
-  redirect,
-  useFetcher,
-  useSearchParams,
-} from 'react-router-dom';
-import { loginApi } from '@/api/auth-api';
-import { setToken } from '@/store/app-store';
+/* eslint-disable react-refresh/only-export-components */
+import type { FC } from 'react'
+import { LockOutlined, UserOutlined } from '@ant-design/icons'
+import { Button, Form, Input, Space, message } from 'antd'
+import { Link, useSearchParams, useFetcher } from 'react-router-dom'
+import type { ActionFunctionArgs } from 'react-router-dom'
+import { loginApi } from '@/api/auth-api.ts'
+import to from 'await-to-js'
+import { setToken } from '@/store/app-store.ts'
 
-const Login: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const loginFetcher = useFetcher();
+const Login: FC = () => {
+  // 解析 URL 中的查询参数
+  const [searchParams] = useSearchParams()
+  const loginFetcher = useFetcher()
 
   const onFinish = (values: LoginForm) => {
-    loginFetcher.submit(values, { method: 'POST' });
-    console.log('Received values of form: ', values);
-  };
+    if (loginFetcher.state === 'submitting') return
+    loginFetcher.submit(values, { method: 'POST' })
+  }
 
   return (
-    <Form
-      onFinish={onFinish}
-      initialValues={{ username: searchParams.get('uname') }}
-    >
+    <Form size="large" initialValues={{ username: searchParams.get('uname') }} onFinish={onFinish}>
       <Form.Item
-        name='username'
+        name="username"
         rules={[
-          { required: true, message: 'Please input your Username!' },
-          {
-            pattern: /^[a-zA-Z0-9]{1,10}$/,
-            message: '用户名必须是1-10位的非空字符!',
-          },
+          { required: true, message: '请输入用户名！' },
+          { pattern: /^[0-9a-zA-Z]{1,10}$/, message: '用户名必须是1-10位的字母数字！' }
         ]}
       >
-        <Input
-          prefix={<UserOutlined className='site-form-item-icon' />}
-          placeholder='Username'
-        />
+        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
       </Form.Item>
       <Form.Item
-        name='password'
+        name="password"
         rules={[
-          { required: true, message: 'Please input your Password!' },
-          {
-            pattern: /^\S{6,15}$/,
-            message: '密码必须是6-15位的非空字符!',
-          },
+          { required: true, message: '请输入密码！' },
+          { pattern: /^\S{6,15}$/, message: '密码必须是6-15位的非空字符！' }
         ]}
       >
-        <Input
-          prefix={<LockOutlined className='site-form-item-icon' />}
-          type='password'
-          placeholder='Password'
-        />
-      </Form.Item>
-      <Form.Item>
-        <a className='login-form-forgot' href=''>
-          Forgot password
-        </a>
+        <Input prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="Password" />
       </Form.Item>
 
       <Form.Item>
-        <Button
-          type='primary'
-          htmlType='submit'
-          className='login-form-button'
-          loading={loginFetcher.state !== 'idle' && { delay: 200 }}
-        >
-          Log in
-        </Button>
-        Or <Link to='/register'>register now!</Link>
+        <Space direction="vertical">
+          <Button type="primary" htmlType="submit" loading={loginFetcher.state === 'submitting' && { delay: 200 }}>
+            Log in
+          </Button>
+          <div>
+            Or <Link to="/reg">register now!</Link>
+          </div>
+        </Space>
       </Form.Item>
     </Form>
-  );
-};
-
-//因为登录成功之后，会把 token 存储到全局 store。紧接着会触发 AuthLayout 组件中的 if(token) 判断，发现 token 有值，因此会通过 <Navigate to="/" replace /> 自动跳转到后台主页。
+  )
+}
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const fd = await request.formData();
-  try {
-    const res = await loginApi(fd);
-    setToken(res.token);
-    message.success(res.message);
-    return null;
-  } catch (err) {
-    console.log(err);
-    return null;
-  }
-};
+  const fd = await request.formData()
+  const [err, res] = await to(loginApi(fd))
 
-export default Login;
+  if (err) return null
+
+  // 全局存储登录成功之后拿到的 token 值
+  setToken(res.token)
+  // 提示用户登录成功
+  message.success(res.message)
+  // 跳转到后台主页
+  // return redirect('/')
+  return null
+}
+
+export default Login
